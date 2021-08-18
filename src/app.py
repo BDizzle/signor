@@ -1,4 +1,4 @@
-from flask import Flask, json, request, abort, make_response, jsonify
+from flask import Flask, json, request, abort, jsonify
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 from requests import Request
 
@@ -12,20 +12,28 @@ def index():
 
 @app.route('/sign', methods=['POST'])
 def validate_request():
-  if request.form['ACCESS_KEY'] == None:
-    abort(make_response(jsonify(message='missing ACCESS_KEY', 400)))
-  elif request.form['SECRET_ACCESS_KEY'] == None:
-    abort(400, 'missing SECRET_ACCESS_KEY')
-  elif request.form['SESSION_TOKEN'] == None:
-    abort(400, 'missing SESSION_TOKEN')
-  elif request.form['HOST'] == None:
-    abort(400, 'missing HOST')
-  elif request.form['REGION'] == None:
-    abort(400, 'missing REGION')
-  elif request.form['SERVICE'] == None:
-    abort(400, 'missing SERVICE')
+
+  #if request.form['ACCESS_KEY'] == None:
+  if 'ACCESS_KEY' not in request.form:
+    abort(400, description='missing ACCESS_KEY')
+  elif 'SECRET_ACCESS_KEY' not in request.form:
+    abort(400, description='missing SECRET_ACCESS_KEY')
+  elif 'SESSION_TOKEN' not in request.form:
+    abort(400, description='missing SESSION_TOKEN')
+  elif 'HOST' not in request.form:
+    abort(400, description='missing HOST')
+  elif 'REGION' not in request.form:
+    abort(400, description='missing REGION')
+  elif 'SERVICE' not in request.form:
+    abort(400, description='missing SERVICE')
   else:
     return sign_request(request.form['ACCESS_KEY'], request.form['SECRET_ACCESS_KEY'])
+
+
+@app.errorhandler(400)
+def bad_request(message):
+  return jsonify(error=str(message)), 400
+
 
 def sign_request(access_key, secret_key):
     host = request.form['HOST']
@@ -41,7 +49,6 @@ def sign_request(access_key, secret_key):
 
     #convert the CaseInsensitiveDict that AWSRequestAuth gives us into a regular dict so that it can be serialized as JSON
     return json.dumps(dict(prepared.headers));
-
 
 if __name__ == '__main__':
     app.run() 
