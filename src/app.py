@@ -2,8 +2,6 @@ from flask import Flask, json, request, abort, jsonify
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 from requests import Request
 
-companies = [{"id": 1, "name": "Company One"}, {"id": 2, "name": "Company Two"}]
-
 app = Flask(__name__)
 
 @app.route('/')
@@ -27,7 +25,7 @@ def validate_request():
   elif 'SERVICE' not in request.form:
     abort(400, description='missing SERVICE')
   else:
-    return sign_request(request.form['ACCESS_KEY'], request.form['SECRET_ACCESS_KEY'])
+    return sign_request(), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 
 @app.errorhandler(400)
@@ -35,7 +33,7 @@ def bad_request(message):
   return jsonify(error=str(message)), 400
 
 
-def sign_request(access_key, secret_key):
+def sign_request():
     host = request.form['HOST']
     auth = AWSRequestsAuth( aws_access_key=request.form['ACCESS_KEY'],
                             aws_secret_access_key=request.form['SECRET_ACCESS_KEY'],
