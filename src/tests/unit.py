@@ -8,7 +8,6 @@ from signor.src import app as flask
 def sign_request(self, data):
 	return self.app.post('/sign', data=data, follow_redirects=True)
 
-
 class Tests(unittest.TestCase):
 
 	def setUp(self):
@@ -16,9 +15,6 @@ class Tests(unittest.TestCase):
 		flask.app.config['WTF_CSRF_ENABLED'] = False
 		self.app = flask.app.test_client()
 		return
-
-	def tearDown(self):
-		pass
 
 	def test_missing_access_key(self):
 		response = sign_request(self, dict())
@@ -75,7 +71,5 @@ class Tests(unittest.TestCase):
 		))
 		self.assertEqual(response.status_code, 200)
 
-
 if __name__ == "__main__":
 	unittest.main()
-

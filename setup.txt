@@ -1,0 +1,8 @@
+To install deps:
+pip install flask aws-requests-auth request
+
+To execute tests:
+./test.py
+
+To start development server
+./run.py

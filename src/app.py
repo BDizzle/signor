@@ -4,14 +4,8 @@ from requests import Request
 
 app = Flask(__name__)
 
-@app.route('/')
-def index():
-  return json.dumps({'hello': 'world'})
-
 @app.route('/sign', methods=['POST'])
 def validate_request():
-
-  #if request.form['ACCESS_KEY'] == None:
   if 'ACCESS_KEY' not in request.form:
     abort(400, description='missing ACCESS_KEY')
   elif 'SECRET_ACCESS_KEY' not in request.form:
@@ -28,10 +22,10 @@ def validate_request():
     return sign_request(), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 
+#return errors as JSON, otherwise it would be HTML
 @app.errorhandler(400)
 def bad_request(message):
   return jsonify(error=str(message)), 400
-
 
 def sign_request():
     host = request.form['HOST']
@@ -42,6 +36,8 @@ def sign_request():
                             aws_region=request.form['REGION'],
                             aws_service=request.form['SERVICE']
                             )
+
+    #need to create an actual request in order to generate the headers, we do NOT actually send this request
     req = Request('GET', host, auth=auth)
     prepared = req.prepare();
 
