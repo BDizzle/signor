@@ -37,14 +37,43 @@ class Tests(unittest.TestCase):
 		))
 		self.assertEqual(response.status_code, 400, 'SESSION_TOKEN is required')
 
-	def test_with_all_required_credentials(self):
+	def test_missing_host(self):
 		response = sign_request(self, dict(
 			ACCESS_KEY='foo',
 			SECRET_ACCESS_KEY='bar',
 			SESSION_TOKEN='baz'
 		))
-		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.status_code, 400, 'HOST is required')
 
+	def test_missing_region(self):
+		response = sign_request(self, dict(
+			ACCESS_KEY='foo',
+			SECRET_ACCESS_KEY='bar',
+			SESSION_TOKEN='baz',
+			HOST='https://hosty.mchostface'
+		))
+		self.assertEqual(response.status_code, 400, 'REGION is required')
+
+	def test_missing_service(self):
+		response = sign_request(self, dict(
+			ACCESS_KEY='foo',
+			SECRET_ACCESS_KEY='bar',
+			SESSION_TOKEN='baz',
+			HOST='https://hosty.mchostface',
+			REGION='yes'
+		))
+		self.assertEqual(response.status_code, 400, 'SERVICE is required')
+
+	def test_valid_request(self):
+		response = sign_request(self, dict(
+			ACCESS_KEY='foo',
+			SECRET_ACCESS_KEY='bar',
+			SESSION_TOKEN='baz',
+			HOST='https://hosty.mchostface',
+			REGION='yes',
+			SERVICE='please'
+		))
+		self.assertEqual(response.status_code, 200)
 
 
 if __name__ == "__main__":

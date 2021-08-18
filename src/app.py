@@ -18,21 +18,28 @@ def validate_request():
     abort(400, 'missing SECRET_ACCESS_KEY')
   elif request.form['SESSION_TOKEN'] == None:
     abort(400, 'missing SESSION_TOKEN')
+  elif request.form['HOST'] == None:
+    abort(400, 'missing HOST')
+  elif request.form['REGION'] == None:
+    abort(400, 'missing REGION')
+  elif request.form['SERVICE'] == None:
+    abort(400, 'missing SERVICE')
   else:
     return sign_request(request.form['ACCESS_KEY'], request.form['SECRET_ACCESS_KEY'])
 
 def sign_request(access_key, secret_key):
+    host = request.form['HOST']
     auth = AWSRequestsAuth( aws_access_key=request.form['ACCESS_KEY'],
                             aws_secret_access_key=request.form['SECRET_ACCESS_KEY'],
-                            aws_host='foo',
-                            aws_region='bar',
-                            aws_service='baz'
+                            aws_token=request.form['SESSION_TOKEN'],
+                            aws_host=host,
+                            aws_region=request.form['REGION'],
+                            aws_service=request.form['SERVICE']
                             )
-    req = Request('GET', 'https://url.com', auth=auth)
+    req = Request('GET', host, auth=auth)
     prepared = req.prepare();
 
-    print(prepared.headers)
-
+    #convert the CaseInsensitiveDict that AWSRequestAuth gives us into a regular dict so that it can be serialized as JSON
     return json.dumps(dict(prepared.headers));
 
 
