@@ -1,4 +1,4 @@
-from flask import Flask, json, request, abort
+from flask import Flask, json, request, abort, make_response, jsonify
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 from requests import Request
 
@@ -13,7 +13,7 @@ def index():
 @app.route('/sign', methods=['POST'])
 def validate_request():
   if request.form['ACCESS_KEY'] == None:
-    abort(400, 'missing ACCESS_KEY')
+    abort(make_response(jsonify(message='missing ACCESS_KEY', 400)))
   elif request.form['SECRET_ACCESS_KEY'] == None:
     abort(400, 'missing SECRET_ACCESS_KEY')
   elif request.form['SESSION_TOKEN'] == None:
