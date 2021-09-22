@@ -6,17 +6,18 @@ app = Flask(__name__)
 
 @app.route('/sign', methods=['POST'])
 def validate_request():
-  if 'ACCESS_KEY' not in request.form:
+  data = request.json
+  if 'ACCESS_KEY' not in data:
     abort(400, description='missing ACCESS_KEY')
-  elif 'SECRET_ACCESS_KEY' not in request.form:
+  elif 'SECRET_ACCESS_KEY' not in data:
     abort(400, description='missing SECRET_ACCESS_KEY')
-  elif 'SESSION_TOKEN' not in request.form:
+  elif 'SESSION_TOKEN' not in data:
     abort(400, description='missing SESSION_TOKEN')
-  elif 'HOST' not in request.form:
+  elif 'HOST' not in data:
     abort(400, description='missing HOST')
-  elif 'REGION' not in request.form:
+  elif 'REGION' not in data:
     abort(400, description='missing REGION')
-  elif 'SERVICE' not in request.form:
+  elif 'SERVICE' not in data:
     abort(400, description='missing SERVICE')
   else:
     return sign_request(), 200, {'Content-Type': 'application/json; charset=utf-8'}
@@ -28,17 +29,17 @@ def bad_request(message):
   return jsonify(error=str(message)), 400
 
 def sign_request():
-    host = request.form['HOST']
-    auth = AWSRequestsAuth( aws_access_key=request.form['ACCESS_KEY'],
-                            aws_secret_access_key=request.form['SECRET_ACCESS_KEY'],
-                            aws_token=request.form['SESSION_TOKEN'],
-                            aws_host=host,
-                            aws_region=request.form['REGION'],
-                            aws_service=request.form['SERVICE']
+    data = request.json
+    auth = AWSRequestsAuth( aws_access_key=data['ACCESS_KEY'],
+                            aws_secret_access_key=data['SECRET_ACCESS_KEY'],
+                            aws_token=data['SESSION_TOKEN'],
+                            aws_host=data['HOST'],
+                            aws_region=data['REGION'],
+                            aws_service=data['SERVICE']
                             )
 
     #need to create an actual request in order to generate the headers, we do NOT actually send this request
-    req = Request('GET', host, auth=auth)
+    req = Request('GET', data['HOST'], auth=auth)
     prepared = req.prepare();
 
     #convert the CaseInsensitiveDict that AWSRequestAuth gives us into a regular dict so that it can be serialized as JSON
