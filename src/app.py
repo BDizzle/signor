@@ -43,7 +43,13 @@ def sign_request():
     prepared = req.prepare();
 
     #convert the CaseInsensitiveDict that AWSRequestAuth gives us into a regular dict so that it can be serialized as JSON
-    return json.dumps(dict(prepared.headers));
+    headers = dict(prepared.headers);
+
+    #add hyphen-less versions of headers that have hyphens in their name
+    headers["XAmzSecurityToken"] = headers["X-Amz-Security-Token"]
+    headers["xamzcontentsha256"] = headers["x-amz-content-sha256"]
+
+    return json.dumps(headers);
 
 if __name__ == '__main__':
     app.run() 
