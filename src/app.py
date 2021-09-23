@@ -48,6 +48,7 @@ def sign_request():
     #add hyphen-less versions of headers that have hyphens in their name
     headers["XAmzSecurityToken"] = headers["X-Amz-Security-Token"]
     headers["xamzcontentsha256"] = headers["x-amz-content-sha256"]
+    headers["xamzdate"] = headers["x-amz-date"]
 
     return json.dumps(headers);
 
